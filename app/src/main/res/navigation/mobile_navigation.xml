@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    android:label="Productos"
+    app:startDestination="@+id/nav_home">
+
+    <fragment
+        android:id="@+id/nav_home"
+        android:name="com.example.facfereteria.ui.home.HomeFragment"
+        android:label="@string/menu_home"
+        tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/nav_Productos"
+        android:name="com.example.facfereteria.Productos"
+        android:label="Productos"
+        tools:layout="@layout/fragment_productos" />
+    <fragment
+        android:id="@+id/nav_Clientes"
+        android:name="com.example.facfereteria.Clientes"
+        android:label="Clientes"
+        tools:layout="@layout/fragment_clientes" />
+    <fragment
+        android:id="@+id/nav_Facturas"
+        android:name="com.example.facfereteria.Facturas"
+        android:label="Facturas"
+        tools:layout="@layout/fragment_facturas" />
+    <fragment
+        android:id="@+id/nav_Pedidos"
+        android:name="com.example.facfereteria.Pedidos"
+        android:label="Pedidos"
+        tools:layout="@layout/fragment_pedidos" />
+</navigation>
