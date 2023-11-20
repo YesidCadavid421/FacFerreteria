@@ -13,13 +13,13 @@
             android:icon="@drawable/ic_group"
             android:title="Clientes" />
         <item
-            android:id="@+id/nav_Pedidos"
-            android:icon="@drawable/ic_list_alt"
-            android:title="Pedidos" />
-        <item
             android:id="@+id/nav_Productos"
             android:icon="@drawable/ic_category"
             android:title="Productos" />
+        <item
+            android:id="@+id/nav_Pedidos"
+            android:icon="@drawable/ic_list_alt"
+            android:title="Pedidos" />
         <item
             android:id="@+id/nav_Facturas"
             android:icon="@drawable/ic_receipt_long"

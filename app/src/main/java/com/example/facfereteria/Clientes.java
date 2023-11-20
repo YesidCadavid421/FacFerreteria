@@ -22,10 +22,10 @@ public class Clientes extends Fragment {
         etNombre = view.findViewById(R.id.etNombre);
         etDireccion = view.findViewById(R.id.etDireccion);
         etTelefono = view.findViewById(R.id.etTelefono);
-        insertar = view.findViewById(R.id.btInsertar);
-        consultar = view.findViewById(R.id.btConsultar);
-        actualizar = view.findViewById(R.id.btActualizar);
-        eliminar = view.findViewById(R.id.btEliminar);
+        insertar = view.findViewById(R.id.btInsertarCliente);
+        consultar = view.findViewById(R.id.btConsultarCliente);
+        actualizar = view.findViewById(R.id.btActualizarCliente);
+        eliminar = view.findViewById(R.id.btEliminarCliente);
 
         insertar.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
@@ -53,7 +53,7 @@ public class Clientes extends Fragment {
     }
 
     public void Insertar (){
-        ConexionBD conexion = new ConexionBD(getContext(),"bdClientes",null,1);
+        ConexionBD conexion = new ConexionBD(getContext(),"database",null,1);
         SQLiteDatabase BaseDeDatos = conexion.getWritableDatabase();
         String cedula = etCedula.getText().toString();
         String nombre = etNombre.getText().toString();
@@ -81,7 +81,7 @@ public class Clientes extends Fragment {
     }
 
     public void Consultar (){
-        ConexionBD conexion = new ConexionBD(getContext(),"bdClientes",null,1);
+        ConexionBD conexion = new ConexionBD(getContext(),"database",null,1);
         SQLiteDatabase BaseDeDatos = conexion.getWritableDatabase();
         String cedula = etCedula.getText().toString();
         if(this.validarVariableCedula()){
@@ -98,7 +98,7 @@ public class Clientes extends Fragment {
     }
 
     public void Actualizar (){
-        ConexionBD conexion = new ConexionBD(getContext(),"bdClientes",null,1);
+        ConexionBD conexion = new ConexionBD(getContext(),"database",null,1);
         SQLiteDatabase BaseDeDatos = conexion.getWritableDatabase();
         String cedula = etCedula.getText().toString();
         String nombre = etNombre.getText().toString();
@@ -132,7 +132,7 @@ public class Clientes extends Fragment {
     }
 
     public void Eliminar (){
-        ConexionBD conexion = new ConexionBD(getContext(),"bdClientes",null,1);
+        ConexionBD conexion = new ConexionBD(getContext(),"database",null,1);
         SQLiteDatabase BaseDeDatos = conexion.getWritableDatabase();
         String cedula = etCedula.getText().toString();
         if(this.validarVariableCedula()){
@@ -158,7 +158,7 @@ public class Clientes extends Fragment {
         }
     }
 
-    public boolean validarVariableCedula(){
+    private boolean validarVariableCedula(){
         String cedulaText = etCedula.getText().toString();
         if (cedulaText.isEmpty()) {
             Toast.makeText(getContext(), "El campo cédula es requerido", Toast.LENGTH_LONG).show();
@@ -172,7 +172,7 @@ public class Clientes extends Fragment {
         return true;
     };
 
-    public boolean validarVariablesCliente(){
+    private boolean validarVariablesCliente(){
         String cedulaText = etCedula.getText().toString();
         String nombreText = etNombre.getText().toString();
         String direccionText = etDireccion.getText().toString();
@@ -207,7 +207,7 @@ public class Clientes extends Fragment {
 
     private boolean esNumero(String texto) {
         try {
-            Double.parseDouble(texto);
+            Integer.parseInt(texto);
             return true;
         } catch (NumberFormatException e) {
             return false;
