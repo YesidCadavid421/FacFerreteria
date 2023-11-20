@@ -17,9 +17,9 @@ public class ConexionBD extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase database) {
         database.execSQL("Create table Cliente(cedula int primary key, nombre text, direccion text, telefono int)");
         database.execSQL("Create table Producto(codigoProducto int primary key, descripcion text, valor real)");
-        database.execSQL("Create table Pedido(codigoPedido int primary key, descripcion text, fechaPedido date, codigoCliente int, foreign key (codigoCliente) references Cliente(codigigoCliente))");
-        database.execSQL("Create table PedProd(codigoPedido int, codigoProducto int, primary key (codigoPedido, codigoProducto), foreign key (codigoPedido) references Pedido(codigoPedido), foreign key (codigoProducto) references Producto(codigoProducto))");
-        database.execSQL("Create table Factura(codigoFactura int primary key, fecha date, valorFactura real, codigoPedido int, foreign key (codigoPedido) references Pedido(codigoPedido))");
+        database.execSQL("Create table Pedido(codigoPedido int primary key, descripcion text, fechaPedido date, codigoCliente int, foreign key (codigoCliente) references Cliente(cedula))");
+        database.execSQL("Create table PedProd(codigoPedido int, codigoProducto int, cantidad int, primary key (codigoPedido, codigoProducto), foreign key (codigoPedido) references Pedido(codigoPedido), foreign key (codigoProducto) references Producto(codigoProducto))");
+        database.execSQL("Create table Factura(codigoFactura int primary key, fechaFactura date, valorFactura real, codigoPedido int, foreign key (codigoPedido) references Pedido(codigoPedido))");
     }
 
     @Override

@@ -13,7 +13,39 @@ import android.widget.Toast;
 
 public class Clientes extends Fragment {
     private EditText etCedula, etNombre, etDireccion, etTelefono;
-    Button insertar, consultar, actualizar, eliminar;
+    private Button insertar, consultar, actualizar, eliminar;
+
+    private static final String ARG_CEDULA = "cedula";
+    private static final String ARG_NOMBRE = "nombre";
+    private static final String ARG_DIRECCION = "direccion";
+    private static final String ARG_TELEFONO = "telefono";
+
+    private Integer cedula;
+    private String nombre;
+    private String direccion;
+    private Integer telefono;
+
+    public Clientes() {
+    }
+
+    public Clientes(Integer cedula, String nombre, String direccion, Integer telefono) {
+        this.cedula = cedula;
+        this.nombre = nombre;
+        this.direccion = direccion;
+        this.telefono = telefono;
+    }
+
+    public static Clientes crearCliente(Integer cedula, String nombre, String direccion, Integer telefono) {
+        return new Clientes(cedula, nombre, direccion, telefono);
+    }
+
+    public String getName() {
+        return nombre;
+    }
+
+    public Integer getCedula() {
+        return cedula;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
