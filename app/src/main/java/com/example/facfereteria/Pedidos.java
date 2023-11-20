@@ -1,5 +1,7 @@
 package com.example.facfereteria;
 import android.app.AlertDialog;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -32,19 +34,22 @@ import java.util.Locale;
 import java.util.Map;
 
 public class Pedidos extends Fragment {
-    private EditText etCodigoPedido, etDescripcion;
+    private EditText etCodigoPedido, etDescripcion, etFecha;
     private Button insertar, consultar, actualizar, eliminar;
     private Spinner spinnerCliente;
-    private View etFecha;
     TextView textView;
     boolean[] selectedLanguage;
-    ArrayList<Integer> langList = new ArrayList<>();
+    ArrayList<Integer> ProductosList = new ArrayList<>();
     private TableLayout tableLayout;
+
+    private Integer cedula;
+    List<Clientes> listclientes;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_pedidos, container, false);
         etFecha = view.findViewById(R.id.etFecha);
-        ((EditText) etFecha).setText(SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, Locale.getDefault()).format(new Date()));
+        etFecha.setText(SimpleDateFormat.getDateInstance(SimpleDateFormat.LONG, Locale.getDefault()).format(new Date()));
         spinnerCliente = view.findViewById(R.id.spinnerCliente);
         etDescripcion = view.findViewById(R.id.etDescripcion2);
         etCodigoPedido = view.findViewById(R.id.etCodPedido);
@@ -53,7 +58,7 @@ public class Pedidos extends Fragment {
         actualizar = view.findViewById(R.id.btActualizarPedido);
         eliminar = view.findViewById(R.id.btEliminarPedido);
         tableLayout = view.findViewById(R.id.tableLayout);
-        List<Clientes> listclientes = obtenerDatosSpinnerCliente();
+        listclientes = obtenerDatosSpinnerCliente();
         List<Map<String, String>> data = new ArrayList<>();
         for (Clientes cliente : listclientes) {
             Map<String, String> item = new HashMap<>();
@@ -77,6 +82,7 @@ public class Pedidos extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 String cedulaSeleccionada = data.get(position).get("cedula");
+                cedula = Integer.parseInt(cedulaSeleccionada);
             }
             @Override
             public void onNothingSelected(AdapterView<?> parentView) {
@@ -86,12 +92,12 @@ public class Pedidos extends Fragment {
         spinnerCliente.setAdapter(adapter);
         insertar.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                //Insertar();
+                Insertar();
             }
         });
         consultar.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                //Consultar();
+                Consultar();
             }
         });
 
@@ -112,40 +118,24 @@ public class Pedidos extends Fragment {
         for (Productos producto : listaProductos) {
             descripcionesProductos.add(producto.getDescripcion());
         }
-
-        // assign variable
         textView = view.findViewById(R.id.textViewMultiSelect);
-
-        // initialize selected language array
         selectedLanguage = new boolean[descripcionesProductos.toArray(new String[0]).length];
 
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                // Initialize alert dialog
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-
-                // set title
                 builder.setTitle("Selecciona los productos");
-
-                // set dialog non cancelable
                 builder.setCancelable(false);
 
                 builder.setMultiChoiceItems(descripcionesProductos.toArray(new String[0]), selectedLanguage, new DialogInterface.OnMultiChoiceClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i, boolean b) {
-                        // check condition
                         if (b) {
-                            // when checkbox selected
-                            // Add position  in lang list
-                            langList.add(i);
-                            // Sort array list
-                            Collections.sort(langList);
+                            ProductosList.add(i);
+                            Collections.sort(ProductosList);
                         } else {
-                            // when checkbox unselected
-                            // Remove position from langList
-                            langList.remove(Integer.valueOf(i));
+                            ProductosList.remove(Integer.valueOf(i));
                         }
                     }
                 });
@@ -166,9 +156,9 @@ public class Pedidos extends Fragment {
                             }
                         }
                         StringBuilder stringBuilder = new StringBuilder();
-                        for (int j = 0; j < langList.size(); j++) {
-                            stringBuilder.append(descripcionesProductos.toArray(new String[0])[langList.get(j)]);
-                            if (j != langList.size() - 1) {
+                        for (int j = 0; j < ProductosList.size(); j++) {
+                            stringBuilder.append(descripcionesProductos.toArray(new String[0])[ProductosList.get(j)]);
+                            if (j != ProductosList.size() - 1) {
                                 stringBuilder.append(", ");
                             }
                         }
@@ -193,7 +183,7 @@ public class Pedidos extends Fragment {
                             // remove all selection
                             selectedLanguage[j] = false;
                             // clear language list
-                            langList.clear();
+                            ProductosList.clear();
                             // clear text view value
                             textView.setText("");
                         }
@@ -207,10 +197,8 @@ public class Pedidos extends Fragment {
     }
 
     private void agregarProductoATabla(TableLayout tableLayout, Productos producto) {
-        // Crea una nueva fila
         TableRow row = new TableRow(getContext());
 
-        // Configura las vistas de la fila
         TextView codigoTextView = new TextView(getContext());
         TextView descripcionTextView = new TextView(getContext());
         TextView valorTextView = new TextView(getContext());
@@ -222,13 +210,9 @@ public class Pedidos extends Fragment {
         codigoTextView.setText(String.valueOf(producto.getCodigo()));
         descripcionTextView.setText(producto.getDescripcion());
         valorTextView.setText(String.valueOf(producto.getValor()));
-
-        // Agrega las vistas a la fila
         row.addView(codigoTextView);
         row.addView(descripcionTextView);
         row.addView(valorTextView);
-
-        // Agrega la fila a la tabla
         tableLayout.addView(row);
     }
 
@@ -286,5 +270,332 @@ public class Pedidos extends Fragment {
             Toast.makeText(getContext(),"No se encontraron resultados para la lista de productos.",Toast.LENGTH_LONG).show();
         }
         return listaProductos;
+    }
+
+    private List<Productos> obtenerInformacionDeTabla(TableLayout tableLayout) {
+        int rowCount = tableLayout.getChildCount();
+        List<Productos> listaProductos = new ArrayList<>();
+
+        for (int i = 1; i < rowCount; i++) {
+            View view = tableLayout.getChildAt(i);
+
+            if (view instanceof TableRow) {
+                TableRow row = (TableRow) view;
+                int columnCount = row.getChildCount();
+                Integer codigoProducto = 0;
+                String descripcion = "";
+                Double valor = 0.0;
+
+                for (int j = 0; j < columnCount; j++) {
+                    View cell = row.getChildAt(j);
+
+                    if (cell instanceof TextView) {
+                        TextView textView = (TextView) cell;
+                        String cellText = textView.getText().toString();
+                        switch (j) {
+                            case 0:
+                                codigoProducto = Integer.parseInt(cellText);
+                                break;
+                            case 1:
+                                descripcion = cellText;
+                                break;
+                            case 2:
+                                valor = Double.parseDouble(cellText);
+                                break;
+                        }
+                    }
+                }
+                Productos producto = new Productos(codigoProducto, descripcion, valor);
+                listaProductos.add(producto);
+            }
+        }
+
+        return listaProductos;
+    }
+    public void Insertar (){
+        ConexionBD conexion = new ConexionBD(getContext(),"database",null,1);
+        SQLiteDatabase BaseDeDatos = conexion.getWritableDatabase();
+        List<Productos> listProductosSeleccionados = obtenerInformacionDeTabla(tableLayout);
+        if(this.validarVariablesPedido(listProductosSeleccionados)){
+            Integer codigoPedido = Integer.parseInt(etCodigoPedido.getText().toString());
+            String descripcionPedido = etDescripcion.getText().toString();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            String fechaFormateada = sdf.format(new Date()).toString();
+            Integer codigoCliente = cedula;
+            Double valorFactura = 0.0;
+            Cursor fila = BaseDeDatos.rawQuery("SELECT codigoPedido FROM Pedido WHERE codigoPedido ="+ codigoPedido, null);
+            if(fila.moveToFirst()) {
+                Toast.makeText(getContext(),"Ya existen registros con este código",Toast.LENGTH_LONG).show();
+                return;
+            }
+            ContentValues insertarPedido = new ContentValues();
+            ContentValues insertarFactura = new ContentValues();
+
+            insertarPedido.put("codigoPedido",codigoPedido);
+            insertarPedido.put("descripcion",descripcionPedido);
+            insertarPedido.put("fechaPedido", fechaFormateada);
+            insertarPedido.put("codigoCliente", codigoCliente);
+            BaseDeDatos.insert("Pedido",null,insertarPedido);
+            etCodigoPedido.setText("");
+            etDescripcion.setText("");
+            ((EditText) etFecha).setText(SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, Locale.getDefault()).format(new Date()));
+
+            for (Productos producto : listProductosSeleccionados) {
+                ContentValues insertarPedProd = new ContentValues();
+                insertarPedProd.put("codigoPedido", codigoPedido);
+                insertarPedProd.put("codigoProducto", producto.getCodigo());
+                BaseDeDatos.insert("PedProd", null, insertarPedProd);
+
+                valorFactura += Double.parseDouble(producto.getValor().toString());
+            }
+            insertarFactura.put("codigoPedido",codigoPedido);
+            insertarFactura.put("fechaFactura",fechaFormateada);
+            insertarFactura.put("valorFactura",valorFactura);
+            insertarFactura.put("codigoPedido", codigoPedido);
+            BaseDeDatos.insert("Factura", null, insertarFactura);
+        }
+        BaseDeDatos.close();
+    }
+
+    public void Consultar (){
+        ConexionBD conexion = new ConexionBD(getContext(), "database", null, 1);
+        SQLiteDatabase BaseDeDatos = conexion.getReadableDatabase();  // Usamos getReadableDatabase en lugar de getWritableDatabase para consultas
+
+        if (validarVariableCodPedido()) {
+            Integer codigoPedido = Integer.parseInt(etCodigoPedido.getText().toString());
+            List<Productos> listaProductos;
+            Cursor fila = BaseDeDatos.rawQuery("SELECT descripcion, fechaPedido, codigoCliente FROM Pedido WHERE codigoPedido = " + codigoPedido, null);
+
+            if (fila.moveToFirst()) {
+                String descripcionPedido = fila.getString(0);
+                String fechaPedido = fila.getString(1);
+                String codigoCliente = fila.getString(2);
+                etDescripcion.setText(descripcionPedido);
+                etFecha.setText(fechaPedido);
+                Integer indiceCliente = obtenerIndiceCliente(Integer.parseInt(codigoCliente));
+                spinnerCliente.setSelection(indiceCliente);
+                listaProductos = obtenerProductosAsociadosAlPedido(codigoPedido, BaseDeDatos);
+                BaseDeDatos.close();
+                actualizarSeleccionMultiple(listaProductos);
+            } else {
+                Toast.makeText(getContext(), "Pedido no encontrado", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    private void actualizarSeleccionMultiple(List<Productos> listaProductosParaCheckear) {
+        // Obtén la lista completa de productos y descripciones
+        List<Productos> listaProductos = obtenerDatosProductos();
+        List<String> descripcionesProductos = new ArrayList<>();
+
+        TableRow headerRow = (TableRow) tableLayout.getChildAt(0);
+        tableLayout.removeAllViews();
+        tableLayout.addView(headerRow);
+        for (int j = 0; j < listaProductosParaCheckear.size(); j++) {
+                Productos productoSeleccionado = listaProductosParaCheckear.get(j);
+                agregarProductoATabla(tableLayout, productoSeleccionado);
+        }
+
+        // use for loop
+        for (int j = 0; j < selectedLanguage.length; j++) {
+            // remove all selection
+            selectedLanguage[j] = false;
+            // clear language list
+            ProductosList.clear();
+            // clear text view value
+            textView.setText("");
+        }
+
+        for (Productos producto : listaProductos) {
+            descripcionesProductos.add(producto.getDescripcion());
+        }
+
+        selectedLanguage = new boolean[descripcionesProductos.size()];
+
+
+
+        for (int i = 0; i < listaProductosParaCheckear.size(); i++) {
+            Productos producto = listaProductosParaCheckear.get(i);
+            int indiceProducto = descripcionesProductos.indexOf(producto.getDescripcion());
+            if (indiceProducto != -1) {
+                selectedLanguage[indiceProducto] = true;
+                ProductosList.add(indiceProducto);
+            }
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int j = 0; j < listaProductosParaCheckear.size(); j++) {
+            stringBuilder.append(descripcionesProductos.toArray(new String[0])[ProductosList.get(j)]);
+            if (j != ProductosList.size() - 1) {
+                stringBuilder.append(", ");
+            }
+        }
+        textView.setText(stringBuilder.toString());
+
+
+        textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("Selecciona los productos");
+                builder.setCancelable(false);
+
+                builder.setMultiChoiceItems(descripcionesProductos.toArray(new String[0]), selectedLanguage, new DialogInterface.OnMultiChoiceClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i, boolean b) {
+                        if (b) {
+                            ProductosList.add(i);
+                            Collections.sort(ProductosList);
+                        } else {
+                            ProductosList.remove(Integer.valueOf(i));
+                        }
+                    }
+                });
+
+                builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        SparseBooleanArray checkedItems = ((AlertDialog) dialogInterface).getListView().getCheckedItemPositions();
+                        TableRow headerRow = (TableRow) tableLayout.getChildAt(0);
+                        tableLayout.removeAllViews();
+                        tableLayout.addView(headerRow);
+                        for (int j = 0; j < checkedItems.size(); j++) {
+                            int position = checkedItems.keyAt(j);
+                            boolean isChecked = checkedItems.valueAt(j);
+                            if (isChecked) {
+                                Productos productoSeleccionado = listaProductos.get(position);
+                                agregarProductoATabla(tableLayout, productoSeleccionado);
+                            }
+                        }
+                        StringBuilder stringBuilder = new StringBuilder();
+                        for (int j = 0; j < ProductosList.size(); j++) {
+                            stringBuilder.append(descripcionesProductos.toArray(new String[0])[ProductosList.get(j)]);
+                            if (j != ProductosList.size() - 1) {
+                                stringBuilder.append(", ");
+                            }
+                        }
+                        textView.setText(stringBuilder.toString());
+                    }
+                });
+
+                builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                });
+                builder.setNeutralButton("Limpiar Todo", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        TableRow headerRow = (TableRow) tableLayout.getChildAt(0);
+                        tableLayout.removeAllViews();
+                        tableLayout.addView(headerRow);
+                        // use for loop
+                        for (int j = 0; j < selectedLanguage.length; j++) {
+                            // remove all selection
+                            selectedLanguage[j] = false;
+                            // clear language list
+                            ProductosList.clear();
+                            // clear text view value
+                            textView.setText("");
+                        }
+                    }
+                });
+                // show dialog
+                builder.show();
+            }
+        });
+    }
+
+    private List<Productos> obtenerProductosAsociadosAlPedido(Integer codigoPedido, SQLiteDatabase BaseDeDatos) {
+        List<Productos> productos = new ArrayList<>();
+        String consultaSQL = "SELECT P.codigoProducto, P.descripcion, P.valor " +
+                "FROM Producto P " +
+                "JOIN PedProd PP ON P.codigoProducto = PP.codigoProducto " +
+                "WHERE PP.codigoPedido = " + codigoPedido;
+        Cursor filaProductos = BaseDeDatos.rawQuery(consultaSQL, null);
+
+        if (filaProductos.moveToFirst()) {
+            do {
+                Integer codigoProducto = filaProductos.getInt(0);
+                String descripcion = filaProductos.getString(1);
+                Double valor = filaProductos.getDouble(2);
+
+                Productos producto = Productos.crearProducto(codigoProducto, descripcion, valor);
+                productos.add(producto);
+            } while (filaProductos.moveToNext());
+        }
+        filaProductos.close();
+        return productos;
+    }
+
+    private int obtenerIndiceCliente(Integer codigoCliente) {
+        for (int i = 0; i < listclientes.size(); i++) {
+            Integer cedulaCliente = listclientes.get(i).getCedula();
+            if (codigoCliente.equals(cedulaCliente)) {
+                return i;
+            }
+        }
+        return 0;
+    }
+
+    private boolean validarVariableCodPedido(){
+        String codigoPedidoText = etCodigoPedido.getText().toString();
+        if (codigoPedidoText.isEmpty()) {
+            Toast.makeText(getContext(), "El campo código del pedido es requerido", Toast.LENGTH_LONG).show();
+            return false;
+        }
+
+        if (!esNumero(codigoPedidoText)) {
+            Toast.makeText(getContext(), "Ingrese solo caracteres numéricos para el código del pedido", Toast.LENGTH_LONG).show();
+            return false;
+        }
+        return true;
+    };
+
+    private boolean validarVariablesPedido(List<Productos> listProductosSeleccionados) {
+        String codigoPedidoText = etCodigoPedido.getText().toString();
+        String descripcionPedidoText = etDescripcion.getText().toString();
+        String codigoClienteText = cedula.toString();
+
+        if (codigoPedidoText.isEmpty()) {
+            Toast.makeText(getContext(), "El campo código del pedido es requerido", Toast.LENGTH_LONG).show();
+            return false;
+        }
+        if (descripcionPedidoText.isEmpty()) {
+            Toast.makeText(getContext(), "El campo descripción del pedido es requerido", Toast.LENGTH_LONG).show();
+            return false;
+        }
+        if (codigoClienteText.isEmpty()) {
+            Toast.makeText(getContext(), "El campo código del cliente es requerido", Toast.LENGTH_LONG).show();
+            return false;
+        }
+        if (!esNumero(codigoPedidoText)) {
+            Toast.makeText(getContext(), "Ingrese solo caracteres numéricos para el código del pedido", Toast.LENGTH_LONG).show();
+            return false;
+        }
+        if(listProductosSeleccionados.size() < 1) {
+            Toast.makeText(getContext(), "Debe de seleccionar almenos un producto", Toast.LENGTH_LONG).show();
+            return false;
+        }
+        return true;
+    }
+
+    private boolean esNumero(String texto) {
+        try {
+            Integer.parseInt(texto);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    private boolean esReal(String texto) {
+        try {
+            Double.parseDouble(texto);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 }

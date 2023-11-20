@@ -15,11 +15,11 @@ public class ConexionBD extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase database) {
-        database.execSQL("Create table Cliente(cedula int primary key, nombre text, direccion text, telefono int)");
-        database.execSQL("Create table Producto(codigoProducto int primary key, descripcion text, valor real)");
-        database.execSQL("Create table Pedido(codigoPedido int primary key, descripcion text, fechaPedido date, codigoCliente int, foreign key (codigoCliente) references Cliente(cedula))");
-        database.execSQL("Create table PedProd(codigoPedido int, codigoProducto int, cantidad int, primary key (codigoPedido, codigoProducto), foreign key (codigoPedido) references Pedido(codigoPedido), foreign key (codigoProducto) references Producto(codigoProducto))");
-        database.execSQL("Create table Factura(codigoFactura int primary key, fechaFactura date, valorFactura real, codigoPedido int, foreign key (codigoPedido) references Pedido(codigoPedido))");
+        database.execSQL("CREATE TABLE Cliente(cedula INTEGER PRIMARY KEY, nombre TEXT, direccion TEXT, telefono INTEGER)");
+        database.execSQL("CREATE TABLE Producto(codigoProducto INTEGER PRIMARY KEY, descripcion TEXT, valor REAL)");
+        database.execSQL("CREATE TABLE Pedido(codigoPedido INTEGER PRIMARY KEY, descripcion TEXT, fechaPedido TEXT, codigoCliente INTEGER, FOREIGN KEY (codigoCliente) REFERENCES Cliente(cedula))");
+        database.execSQL("CREATE TABLE PedProd(codigoPedido INTEGER, codigoProducto INTEGER, PRIMARY KEY (codigoPedido, codigoProducto), FOREIGN KEY (codigoPedido) REFERENCES Pedido(codigoPedido), FOREIGN KEY (codigoProducto) REFERENCES Producto(codigoProducto))");
+        database.execSQL("CREATE TABLE Factura(codigoFactura INTEGER PRIMARY KEY, fechaFactura TEXT, valorFactura REAL, codigoPedido INTEGER, FOREIGN KEY (codigoPedido) REFERENCES Pedido(codigoPedido))");
     }
 
     @Override
