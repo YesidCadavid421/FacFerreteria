@@ -103,13 +103,13 @@ public class Pedidos extends Fragment {
 
         actualizar.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                //Actualizar();
+                Actualizar();
             }
         });
 
         eliminar.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                //Eliminar();
+                Eliminar();
             }
         });
 
@@ -336,9 +336,6 @@ public class Pedidos extends Fragment {
             insertarPedido.put("fechaPedido", fechaFormateada);
             insertarPedido.put("codigoCliente", codigoCliente);
             BaseDeDatos.insert("Pedido",null,insertarPedido);
-            etCodigoPedido.setText("");
-            etDescripcion.setText("");
-            ((EditText) etFecha).setText(SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, Locale.getDefault()).format(new Date()));
 
             for (Productos producto : listProductosSeleccionados) {
                 ContentValues insertarPedProd = new ContentValues();
@@ -348,11 +345,23 @@ public class Pedidos extends Fragment {
 
                 valorFactura += Double.parseDouble(producto.getValor().toString());
             }
-            insertarFactura.put("codigoPedido",codigoPedido);
+            insertarFactura.put("codigoFactura",codigoPedido);
             insertarFactura.put("fechaFactura",fechaFormateada);
             insertarFactura.put("valorFactura",valorFactura);
             insertarFactura.put("codigoPedido", codigoPedido);
             BaseDeDatos.insert("Factura", null, insertarFactura);
+            etCodigoPedido.setText("");
+            etDescripcion.setText("");
+            ((EditText) etFecha).setText(SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, Locale.getDefault()).format(new Date()));
+            TableRow headerRow = (TableRow) tableLayout.getChildAt(0);
+            tableLayout.removeAllViews();
+            tableLayout.addView(headerRow);
+            for (int j = 0; j < selectedLanguage.length; j++) {
+                selectedLanguage[j] = false;
+                ProductosList.clear();
+                textView.setText("");
+            }
+            Toast.makeText(getContext(),"Registro creado, consulte la factura con el código de pedido",Toast.LENGTH_LONG).show();
         }
         BaseDeDatos.close();
     }
@@ -360,7 +369,6 @@ public class Pedidos extends Fragment {
     public void Consultar (){
         ConexionBD conexion = new ConexionBD(getContext(), "database", null, 1);
         SQLiteDatabase BaseDeDatos = conexion.getReadableDatabase();  // Usamos getReadableDatabase en lugar de getWritableDatabase para consultas
-
         if (validarVariableCodPedido()) {
             Integer codigoPedido = Integer.parseInt(etCodigoPedido.getText().toString());
             List<Productos> listaProductos;
@@ -379,6 +387,117 @@ public class Pedidos extends Fragment {
                 actualizarSeleccionMultiple(listaProductos);
             } else {
                 Toast.makeText(getContext(), "Pedido no encontrado", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+
+    public void Actualizar() {
+        ConexionBD conexion = new ConexionBD(getContext(), "database", null, 1);
+        SQLiteDatabase BaseDeDatos = conexion.getWritableDatabase();
+        List<Productos> listProductosSeleccionados = obtenerInformacionDeTabla(tableLayout);
+        if (this.validarVariablesPedido(listProductosSeleccionados)) {
+            Integer codigoPedido = Integer.parseInt(etCodigoPedido.getText().toString());
+            Cursor fila = BaseDeDatos.rawQuery("SELECT descripcion, fechaPedido, codigoCliente FROM Pedido WHERE codigoPedido = " + codigoPedido, null);
+            if(!fila.moveToFirst()) {
+                Toast.makeText(getContext(),"No existen registros con este código para actualizar",Toast.LENGTH_LONG).show();
+                return;
+            }
+            String descripcionPedido = etDescripcion.getText().toString();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            String fechaFormateada = sdf.format(new Date()).toString();
+            Integer codigoCliente = cedula;
+            Double valorFactura = 0.0;
+
+            ContentValues actualizarPedido = new ContentValues();
+            actualizarPedido.put("descripcion", descripcionPedido);
+            actualizarPedido.put("fechaPedido", fechaFormateada);
+            actualizarPedido.put("codigoCliente", codigoCliente);
+            String whereClausePedido = "codigoPedido=?";
+            String[] whereArgsPedido = {codigoPedido.toString()};
+            int filasActualizadasPedido = BaseDeDatos.update("Pedido", actualizarPedido, whereClausePedido, whereArgsPedido);
+
+            if (filasActualizadasPedido > 0) {
+                Toast.makeText(getContext(), "Registro actualizado, consulte la factura con el código de pedido", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getContext(), "No se pudo actualizar el registro", Toast.LENGTH_LONG).show();
+                return;
+            }
+            BaseDeDatos.delete("PedProd", "codigoPedido=?", new String[]{codigoPedido.toString()});
+            for (Productos producto : listProductosSeleccionados) {
+                ContentValues insertarPedProd = new ContentValues();
+                insertarPedProd.put("codigoPedido", codigoPedido);
+                insertarPedProd.put("codigoProducto", producto.getCodigo());
+                BaseDeDatos.insert("PedProd", null, insertarPedProd);
+                valorFactura += Double.parseDouble(producto.getValor().toString());
+            }
+            ContentValues actualizarFactura = new ContentValues();
+            actualizarFactura.put("codigoFactura",codigoPedido);
+            actualizarFactura.put("fechaFactura",fechaFormateada);
+            actualizarFactura.put("valorFactura",valorFactura);
+            actualizarFactura.put("codigoPedido", codigoPedido);
+
+            String whereClauseFactura = "codigoPedido=?";
+            String[] whereArgsFactura = {codigoPedido.toString()};
+            int filasActualizadasFactura = BaseDeDatos.update("Factura", actualizarFactura, whereClauseFactura, whereArgsFactura);
+
+            if (filasActualizadasFactura > 0) {
+                Toast.makeText(getContext(), "Registro actualizado, consulte la factura con el código de pedido", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getContext(), "No se pudo actualizar el registro de Factura", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            BaseDeDatos.close();
+            etCodigoPedido.setText("");
+            etDescripcion.setText("");
+            ((EditText) etFecha).setText(SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, Locale.getDefault()).format(new Date()));
+            TableRow headerRow = (TableRow) tableLayout.getChildAt(0);
+            tableLayout.removeAllViews();
+            tableLayout.addView(headerRow);
+            for (int j = 0; j < selectedLanguage.length; j++) {
+                selectedLanguage[j] = false;
+                ProductosList.clear();
+                textView.setText("");
+            }
+        }
+    }
+
+    public void Eliminar() {
+        ConexionBD conexion = new ConexionBD(getContext(), "database", null, 1);
+        SQLiteDatabase BaseDeDatos = conexion.getWritableDatabase();
+
+        if (this.validarVariableCodPedido()) {
+            String codPedido = etCodigoPedido.getText().toString();
+            String whereClausePedido = "codigoPedido=?";
+            String[] whereArgsPedido = {codPedido};
+            Cursor fila = BaseDeDatos.rawQuery("SELECT descripcion, fechaPedido, codigoCliente FROM Pedido WHERE codigoPedido = " + codPedido, null);
+            if(!fila.moveToFirst()) {
+                Toast.makeText(getContext(),"No existen registros con este código para eliminar",Toast.LENGTH_LONG).show();
+                return;
+            }
+            BaseDeDatos.delete("PedProd", whereClausePedido, whereArgsPedido);
+            BaseDeDatos.delete("Factura", whereClausePedido, whereArgsPedido);
+
+            int filasEliminadasPedido = BaseDeDatos.delete("Pedido", whereClausePedido, whereArgsPedido);
+
+            if (filasEliminadasPedido > 0) {
+                Toast.makeText(getContext(), "Registro de Pedido eliminado exitosamente", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getContext(), "No se pudo eliminar el registro de Pedido", Toast.LENGTH_LONG).show();
+                return;
+            }
+            BaseDeDatos.close();
+            etCodigoPedido.setText("");
+            etDescripcion.setText("");
+            ((EditText) etFecha).setText(SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, Locale.getDefault()).format(new Date()));
+            TableRow headerRow = (TableRow) tableLayout.getChildAt(0);
+            tableLayout.removeAllViews();
+            tableLayout.addView(headerRow);
+            for (int j = 0; j < selectedLanguage.length; j++) {
+                selectedLanguage[j] = false;
+                ProductosList.clear();
+                textView.setText("");
             }
         }
     }

@@ -7,14 +7,31 @@
     tools:context=".ui.home.HomeFragment">
 
     <TextView
+        android:id="@+id/text_home2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:text="La Ferretería Rodamientos y Fierros se complace en ofrecer una aplicación diseñada pensando en la comodidad y eficiencia de nuestros administradores. Nuestra aplicación proporciona herramientas rápidas y efectivas para que los administradores gestionen los pedidos de los clientes de manera segura y eficiente."
+        android:textAlignment="viewStart"
+        android:textColor="#717171"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_home" />
+
+    <TextView
         android:id="@+id/text_home"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="352dp"
+        android:layout_marginTop="32dp"
         android:layout_marginEnd="8dp"
-        android:text="PRUEBA"
+        android:text="FERRETERIA RODAMIENTOS Y FIERROS"
         android:textAlignment="center"
+        android:textColor="#000000"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"

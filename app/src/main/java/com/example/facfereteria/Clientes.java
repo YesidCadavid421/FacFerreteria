@@ -82,11 +82,11 @@ public class Clientes extends Fragment {
     public void Insertar (){
         ConexionBD conexion = new ConexionBD(getContext(),"database",null,1);
         SQLiteDatabase BaseDeDatos = conexion.getWritableDatabase();
-        String cedula = etCedula.getText().toString();
-        String nombre = etNombre.getText().toString();
-        String direccion = etDireccion.getText().toString();
-        String telefono = etTelefono.getText().toString();
         if(this.validarVariablesCliente()){
+            String cedula = etCedula.getText().toString();
+            String nombre = etNombre.getText().toString();
+            String direccion = etDireccion.getText().toString();
+            String telefono = etTelefono.getText().toString();
             Cursor fila = BaseDeDatos.rawQuery("select nombre, direccion, telefono from Cliente where cedula ="+ cedula, null);
             if(fila.moveToFirst()) {
                 Toast.makeText(getContext(),"Ya existen registros con este numero de cedula",Toast.LENGTH_LONG).show();
@@ -110,8 +110,8 @@ public class Clientes extends Fragment {
     public void Consultar (){
         ConexionBD conexion = new ConexionBD(getContext(),"database",null,1);
         SQLiteDatabase BaseDeDatos = conexion.getWritableDatabase();
-        String cedula = etCedula.getText().toString();
         if(this.validarVariableCedula()){
+            String cedula = etCedula.getText().toString();
             Cursor fila= BaseDeDatos.rawQuery("select nombre, direccion, telefono from Cliente where cedula ="+ cedula, null);
             if (fila.moveToFirst()){
                 etNombre.setText(fila.getString(0));
@@ -127,11 +127,11 @@ public class Clientes extends Fragment {
     public void Actualizar (){
         ConexionBD conexion = new ConexionBD(getContext(),"database",null,1);
         SQLiteDatabase BaseDeDatos = conexion.getWritableDatabase();
-        String cedula = etCedula.getText().toString();
-        String nombre = etNombre.getText().toString();
-        String direccion = etDireccion.getText().toString();
-        String telefono = etTelefono.getText().toString();
         if(this.validarVariablesCliente()){
+            String cedula = etCedula.getText().toString();
+            String nombre = etNombre.getText().toString();
+            String direccion = etDireccion.getText().toString();
+            String telefono = etTelefono.getText().toString();
             Cursor fila = BaseDeDatos.rawQuery("select nombre, direccion, telefono from Cliente where cedula ="+ cedula, null);
             if(!fila.moveToFirst()) {
                 Toast.makeText(getContext(),"No existen registros con este numero de cedula para actualizar",Toast.LENGTH_LONG).show();

@@ -8,7 +8,7 @@
     tools:context=".Facturas" >
 
     <EditText
-        android:id="@+id/etValor3"
+        android:id="@+id/etCodigoPedidoFactura"
         android:layout_width="193dp"
         android:layout_height="38dp"
         android:layout_marginStart="110dp"
@@ -61,7 +61,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/textView11"
-        app:layout_constraintTop_toBottomOf="@+id/btConsultarProducto2" />
+        app:layout_constraintTop_toBottomOf="@+id/btConsultarFactura" />
 
     <EditText
         android:id="@+id/etFecha2"
@@ -87,10 +87,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btConsultarProducto2" />
+        app:layout_constraintTop_toBottomOf="@+id/btConsultarFactura" />
 
     <Button
-        android:id="@+id/btConsultarProducto2"
+        android:id="@+id/btConsultarFactura"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
@@ -126,14 +126,4 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <GridView
-        android:layout_width="409dp"
-        android:layout_height="387dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/etValor3"
-        app:layout_constraintVertical_bias="0.0" />
 </androidx.constraintlayout.widget.ConstraintLayout>

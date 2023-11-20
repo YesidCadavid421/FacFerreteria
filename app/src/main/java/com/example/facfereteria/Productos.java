@@ -89,10 +89,10 @@ public class Productos extends Fragment {
     public void Insertar (){
         ConexionBD conexion = new ConexionBD(getContext(),"database",null,1);
         SQLiteDatabase BaseDeDatos = conexion.getWritableDatabase();
-        String codProducto = etCodProducto.getText().toString();
-        String descripcion = etDescripcion.getText().toString();
-        String valor = etValor.getText().toString();
         if(this.validarVariablesProducto()){
+            String codProducto = etCodProducto.getText().toString();
+            String descripcion = etDescripcion.getText().toString();
+            String valor = etValor.getText().toString();
             Cursor fila= BaseDeDatos.rawQuery("select descripcion, valor from Producto where codigoProducto ="+ codProducto, null);
             if(fila.moveToFirst()) {
                 Toast.makeText(getContext(),"Ya existen registros con este código",Toast.LENGTH_LONG).show();
@@ -114,8 +114,8 @@ public class Productos extends Fragment {
     public void Consultar (){
         ConexionBD conexion = new ConexionBD(getContext(),"database",null,1);
         SQLiteDatabase BaseDeDatos = conexion.getWritableDatabase();
-        String codProducto = etCodProducto.getText().toString();
         if(this.validarVariableCodProducto()){
+            String codProducto = etCodProducto.getText().toString();
             Cursor fila= BaseDeDatos.rawQuery("select descripcion, valor from Producto where codigoProducto ="+ codProducto, null);
             if (fila.moveToFirst()){
                 etDescripcion.setText(fila.getString(0));
@@ -130,10 +130,10 @@ public class Productos extends Fragment {
     public void Actualizar (){
         ConexionBD conexion = new ConexionBD(getContext(),"database",null,1);
         SQLiteDatabase BaseDeDatos = conexion.getWritableDatabase();
-        String codProducto = etCodProducto.getText().toString();
-        String descripcion = etDescripcion.getText().toString();
-        String valor = etValor.getText().toString();
         if(this.validarVariablesProducto()){
+            String codProducto = etCodProducto.getText().toString();
+            String descripcion = etDescripcion.getText().toString();
+            String valor = etValor.getText().toString();
             Cursor fila= BaseDeDatos.rawQuery("select descripcion, valor from Producto where codigoProducto ="+ codProducto, null);
             if(!fila.moveToFirst()) {
                 Toast.makeText(getContext(),"No existen registros con este código para actualizar",Toast.LENGTH_LONG).show();
