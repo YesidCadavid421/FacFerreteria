@@ -12,12 +12,42 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 public class Productos extends Fragment {
 
     private EditText etCodProducto, etDescripcion, etValor;
     Button insertar, consultar, actualizar, eliminar;
+
+    private Integer codigoProducto;
+    private String descripcion;
+    private Double valor;
+
+    public Productos() {
+    }
+
+    public Productos(Integer codigoProducto, String descripcion, Double valor) {
+        this.codigoProducto = codigoProducto;
+        this.descripcion = descripcion;
+        this.valor = valor;
+    }
+
+    public static Productos crearProducto(Integer codigoProducto, String descripcion, Double valor) {
+        return new Productos(codigoProducto, descripcion, valor);
+    }
+
+    public Integer getCodigo() {
+        return codigoProducto;
+    }
+
+    public Double getValor() {
+        return valor;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
