@@ -163,9 +163,14 @@ public class Productos extends Fragment {
         SQLiteDatabase BaseDeDatos = conexion.getWritableDatabase();
         String codProducto = etCodProducto.getText().toString();
         if(this.validarVariablesProducto()){
-            Cursor fila= BaseDeDatos.rawQuery("select descripcion, valor from Producto where codigoProducto ="+ codProducto, null);
+            Cursor fila= BaseDeDatos.rawQuery("SELECT descripcion, valor FROM Producto WHERE codigoProducto ="+ codProducto, null);
             if(!fila.moveToFirst()) {
                 Toast.makeText(getContext(),"No existen registros con este código para eliminar",Toast.LENGTH_LONG).show();
+                return;
+            }
+            Cursor fila2 = BaseDeDatos.rawQuery("SELECT codigoPedido FROM PedProd WHERE codigoProducto ="+ codProducto, null);
+            if(fila2.moveToFirst()) {
+                Toast.makeText(getContext(),"Existen registros asociados al pedido, no se pudo eliminar",Toast.LENGTH_LONG).show();
                 return;
             }
             String whereClause = "codigoProducto=?";

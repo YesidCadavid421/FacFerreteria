@@ -168,6 +168,11 @@ public class Clientes extends Fragment {
                 Toast.makeText(getContext(),"No existen registros con este numero de cedula para eliminar",Toast.LENGTH_LONG).show();
                 return;
             }
+            Cursor fila2 = BaseDeDatos.rawQuery("SELECT codigoPedido FROM Pedido WHERE codigoCliente ="+ cedula, null);
+            if(fila2.moveToFirst()) {
+                Toast.makeText(getContext(),"Existen registros asociados al pedido, no se pudo eliminar",Toast.LENGTH_LONG).show();
+                return;
+            }
             String whereClause = "cedula=?";
             String[] whereArgs = {cedula};
             int filasEliminadas = BaseDeDatos.delete("Cliente", whereClause, whereArgs);
